@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pro Temp Mail Generator</title>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Segoe UI',sans-serif;
+    background:#121212;
+    color:#e0e0e0;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  header{
+    background:linear-gradient(135deg,#1f1f1f,#282828,#1a1a1a);
+    padding:20px;text-align:center;
+    border-bottom:2px solid #00ffc8;
+  }
+  header h1{
+    color:#00ffc8;
+    font-size:2rem;
+    letter-spacing:1px;
+    text-shadow:0 0 10px #00ffc8;
+  }
+  main{flex:1;max-width:1300px;margin:auto;padding:20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .box{
+    background:#1c1c1c;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 0 25px rgba(0,255,200,0.1);
+    border:1px solid #00ffc8;
+  }
+  .titleh{
+    font-size:1.5rem;color:#00ffc8;margin-bottom:15px;
+    border-left:5px solid #00ffc8;padding-left:12px;
+  }
+  .controls{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:15px;
+    align-items:end;
+    margin-bottom:20px
+  }
+  .controls label{margin-bottom:5px;font-size:0.9rem;color:#00ffc8;display:flex;align-items:center;gap:5px;}
+  .controls select, .controls input, .controls button{
+    padding:10px;border-radius:8px;border:1px solid #374151;
+    background:#1f1f1f;color:#e0e0e0;font-size:.95rem;width:100%;
+    transition:0.2s;
+  }
+  .controls select:hover,.controls input:hover{border-color:#00ffc8;}
+  button{
+    background:linear-gradient(90deg,#00ffc8,#0077ff);
+    border:none;cursor:pointer;font-weight:bold;
+    transition:.3s;display:flex;align-items:center;justify-content:center;gap:5px;
+  }
+  button:hover{transform:scale(1.05);box-shadow:0 0 12px #00ffc8;}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  td{border:1px solid #2d3748;padding:10px}
+  td:first-child{color:#00ffc8;font-weight:bold;width:25%;display:flex;align-items:center;gap:5px}
+  .value-cell{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .copy-btn{
+    border:1px solid #00ffc8;background:transparent;color:#00ffc8;
+    padding:3px 8px;border-radius:6px;font-size:.8rem;cursor:pointer;
+    transition:.2s;display:flex;align-items:center;gap:3px;
+  }
+  .copy-btn:hover{background:#00ffc8;color:#0d1117}
+  .copy-btn.copied{background:#10b981;border-color:#10b981;color:#fff}
+  #inbox-list{list-style:none;margin-top:10px;padding:0;max-height:400px;overflow-y:auto;scroll-behavior:smooth}
+  #inbox-list li{
+    background:#242424;padding:12px;border-radius:10px;
+    margin-bottom:10px;border:1px solid #2d3748;cursor:pointer;
+    transition:.3s;
+  }
+  #inbox-list li:hover{background:#2c2c2c;border-color:#00ffc8;}
+  #inbox-list strong{color:#00ffc8}
+  footer{background:#0a0f0f;color:#999;text-align:center;padding:12px;font-size:.9rem;border-top:1px solid #1f2937}
+  #modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);
+    display:none;align-items:center;justify-content:center;z-index:999}
+  #modal .content{
+    background:#1c1c1c;color:#e0e0e0;padding:25px;
+    border-radius:12px;max-width:700px;width:90%;max-height:80%;
+    overflow:auto;box-shadow:0 0 35px rgba(0,255,200,.3);
+    animation:fadeIn .3s ease
+  }
+  #modal .close{float:right;cursor:pointer;font-size:1.4rem;color:#00ffc8}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1><i class="fa-solid fa-envelope-circle-check"></i> Pro Temp Mail Generator</h1></header>
+<main>
+  <div class="grid">
+    <!-- Profile Section -->
+    <section class="box">
+      <h2 class="titleh"><i class="fa-solid fa-user-secret"></i> Fake Profile</h2>
+
+      <div class="controls">
+        <div style="display:flex;flex-direction:column">
+          <label for="country"><i class="fa-solid fa-flag"></i> Country:</label>
+          <select id="country">
+            <option value="">Any</option>
+            <option value="us">US</option>
+            <option value="gb">UK</option>
+            <option value="ca">Canada</option>
+            <option value="mx">Mexico</option>
+            <option value="br">Brazil</option>
+            <option value="fr">France</option>
+            <option value="de">Germany</option>
+            <option value="es">Spain</option>
+            <option value="au">Australia</option>
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+          <label for="provider"><i class="fa-solid fa-server"></i> Provider:</label>
+          <select id="provider" onchange="toggleDomainSelect()">
+            <option value="1secmail">1secmail</option>
+            <option value="guerrilla">GuerrillaMail</option>
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+          <label for="custom-login"><i class="fa-solid fa-user-pen"></i> Custom Username:</label>
+          <input id="custom-login" placeholder="username (optional)">
+        </div>
+
+        <div style="display:flex;flex-direction:column">
+          <label for="domain"><i class="fa-solid fa-globe"></i> Domain:</label>
+          <select id="domain">
+            <option value="">Random</option>
+          </select>
+        </div>
+
+        <div style="display:flex;justify-content:flex-start;align-items:center">
+          <button onclick="loadUser()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate</button>
+        </div>
+      </div>
+
+      <table>
+        <tr><td><i class="fa-solid fa-id-card"></i> Full Name</td><td class="value-cell"><span id="user-name"></span><button class="copy-btn" onclick="copyText('user-name',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-at"></i> Email</td><td class="value-cell"><span id="user-email"></span><button class="copy-btn" onclick="copyText('user-email',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-road"></i> Street</td><td class="value-cell"><span id="user-street"></span><button class="copy-btn" onclick="copyText('user-street',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-city"></i> City</td><td class="value-cell"><span id="user-city"></span><button class="copy-btn" onclick="copyText('user-city',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-map"></i> State</td><td class="value-cell"><span id="user-state"></span><button class="copy-btn" onclick="copyText('user-state',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-mailbox"></i> Postcode</td><td class="value-cell"><span id="user-postcode"></span><button class="copy-btn" onclick="copyText('user-postcode',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-flag"></i> Country</td><td class="value-cell"><span id="user-country"></span><button class="copy-btn" onclick="copyText('user-country',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+        <tr><td><i class="fa-solid fa-phone"></i> Phone</td><td class="value-cell"><span id="user-phone"></span><button class="copy-btn" onclick="copyText('user-phone',this)"><i class="fa-solid fa-copy"></i> Copy</button></td></tr>
+      </table>
+    </section>
+
+    <!-- Inbox Section -->
+    <section class="box">
+      <h2 class="titleh"><i class="fa-solid fa-inbox"></i> Inbox</h2>
+      <p><i class="fa-solid fa-envelope"></i> Your email: <strong id="temp-email"></strong></p>
+      <ul id="inbox-list"></ul>
+    </section>
+  </div>
+</main>
+
+<footer>&copy;2025 Pro Temp Mail System</footer>
+
+<!-- Modal -->
+<div id="modal">
+  <div class="content">
+    <span class="close" onclick="closeModal()"><i class="fa-solid fa-circle-xmark"></i></span>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+let tempLogin,tempDomain,provider,sidToken,inboxInterval;
+
+const domains1SecMail=["1secmail.com","1secmail.net","1secmail.org","esiix.com","wwjmp.com","yoggm.com","vddaz.com","xojxe.com","laafd.com","kmdt.cm","oosln.com"];
+const domainsGuerrilla=["sharklasers.com","guerrillamail.org","spam4.me","mailinator.com"];
+
+function toggleDomainSelect(){
+  provider=document.getElementById("provider").value;
+  const domainSelect=document.getElementById("domain");
+  domainSelect.innerHTML="";
+  let domains=[];
+  if(provider==="1secmail") domains=domains1SecMail;
+  if(provider==="guerrilla") domains=domainsGuerrilla;
+  domainSelect.innerHTML=`<option value="">Random</option>`;
+  domains.forEach(d=>{const opt=document.createElement("option");opt.value=d;opt.textContent=d;domainSelect.appendChild(opt);});
+}
+
+async function loadUser(){
+  clearInterval(inboxInterval);
+  const country=document.getElementById("country").value;
+  const url=country?`https://randomuser.me/api/?nat=${country}`:"https://randomuser.me/api/";
+  const res=await fetch(url);
+  const data=await res.json();
+  const user=data.results[0];
+
+  document.getElementById("user-name").textContent=user.name.first+" "+user.name.last;
+  document.getElementById("user-street").textContent=user.location.street.number+" "+user.location.street.name;
+  document.getElementById("user-city").textContent=user.location.city;
+  document.getElementById("user-state").textContent=user.location.state;
+  document.getElementById("user-postcode").textContent=user.location.postcode;
+  document.getElementById("user-country").textContent=user.location.country;
+  document.getElementById("user-phone").textContent=user.phone;
+
+  provider=document.getElementById("provider").value;
+  const customLogin=document.getElementById("custom-login").value.trim();
+  const selectedDomain=document.getElementById("domain").value;
+
+  if(provider==="1secmail"){
+    tempLogin=customLogin||user.login.username;
+    tempDomain=selectedDomain||domains1SecMail[Math.floor(Math.random()*domains1SecMail.length)];
+    const tempEmail=`${tempLogin}@${tempDomain}`;
+    document.getElementById("user-email").textContent=tempEmail;
+    document.getElementById("temp-email").textContent=tempEmail;
+  }
+
+  if(provider==="guerrilla"){
+    let resp=await fetch("https://api.guerrillamail.com/ajax.php?f=get_email_address");
+    let acc=await resp.json();
+    tempLogin=customLogin||acc.email_addr.split("@")[0];
+    sidToken=acc.sid_token;
+    tempDomain=selectedDomain||acc.email_addr.split("@")[1];
+    const tempEmail=`${tempLogin}@${tempDomain}`;
+    document.getElementById("user-email").textContent=tempEmail;
+    document.getElementById("temp-email").textContent=tempEmail;
+  }
+
+  loadInbox();
+  inboxInterval=setInterval(loadInbox,10000); 
+}
+
+async function loadInbox(){
+  const inbox=document.getElementById("inbox-list");
+  inbox.innerHTML="<li>Checking messages...</li>";
+
+  if(provider==="1secmail"){
+    let res=await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${tempLogin}&domain=${tempDomain}`);
+    let mails=await res.json();
+    inbox.innerHTML=mails.length?"":"<li>No new messages</li>";
+    mails.forEach(m=>{
+      let li=document.createElement("li");
+      li.innerHTML=`<strong>From:</strong> ${m.from}<br><strong>Subject:</strong> ${m.subject}<br><em>${m.date}</em>`;
+      li.onclick=()=>openMail1SecMail(m.id);
+      inbox.appendChild(li);
+    });
+  }
+
+  if(provider==="guerrilla"){
+    let resp=await fetch(`https://api.guerrillamail.com/ajax.php?f=get_email_list&sid_token=${sidToken}`);
+    let mails=await resp.json();
+    inbox.innerHTML=mails.list.length?"":"<li>No new messages</li>";
+    mails.list.forEach(m=>{
+      let li=document.createElement("li");
+      li.innerHTML=`<strong>From:</strong> ${m.mail_from}<br><strong>Subject:</strong> ${m.mail_subject}<br><em>${m.mail_timestamp}</em>`;
+      li.onclick=()=>openMailGuerrilla(m.mail_id);
+      inbox.appendChild(li);
+    });
+  }
+}
+
+async function openMail1SecMail(id){
+  let res=await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${tempLogin}&domain=${tempDomain}&id=${id}`);
+  let msg=await res.json();
+  showModal(`<h3>${msg.subject}</h3><p><strong>From:</strong> ${msg.from}</p><hr>${msg.textBody||msg.htmlBody||"(Empty)"}`);
+}
+
+async function openMailGuerrilla(id){
+  let res=await fetch(`https://api.guerrillamail.com/ajax.php?f=fetch_email&sid_token=${sidToken}&email_id=${id}`);
+  let msg=await res.json();
+  showModal(`<h3>${msg.mail_subject}</h3><p><strong>From:</strong> ${msg.mail_from}</p><hr>${msg.mail_body}`);
+}
+
+function showModal(content){document.getElementById("modal-body").innerHTML=content;document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";}
+
+function copyText(id,btn){
+  const txt=document.getElementById(id).textContent;
+  if(!txt)return;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';btn.classList.add("copied");
+    setTimeout(()=>{btn.innerHTML='<i class="fa-solid fa-copy"></i> Copy';btn.classList.remove("copied")},1500);
+  });
+}
+
+toggleDomainSelect();
+loadUser();
+</script>
+</body>
+</html>
